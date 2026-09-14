@@ -7,6 +7,7 @@ using Rest_Exercise_1.Repositories;
 
 namespace Rest_Exercise_1.Controllers
 {
+    [EnableCors("MyPolicy")] // ADD CORS policy to the controller
     [Route("api/[controller]")]
     [ApiController]
     public class CatsController : ControllerBase
@@ -20,8 +21,8 @@ namespace Rest_Exercise_1.Controllers
         }
 
 
-
         // GET: api/cats
+        [DisableCors]
         [HttpGet]
         //[EnableCors("AllowAll")]  // Enable CORS for this endpoint
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -31,9 +32,9 @@ namespace Rest_Exercise_1.Controllers
         }
 
         // GET api/cats/1
+        [DisableCors]
         [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public ActionResult<Cat> Get(int id)
         {
             Cat? cat = _repository.GetById(id);
