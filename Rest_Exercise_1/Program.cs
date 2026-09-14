@@ -18,13 +18,12 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add services to the container.
-builder.Services.AddControllers();
-
-// Add Swagger services for API documentation and testing
+// Add swagger (Swashbuckle)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add services to the container.
+builder.Services.AddControllers();
 
 // Register repository interfaces so controllers depend on abstractions.
 // Keep them as singletons so the in-memory lists persist across requests.
@@ -36,7 +35,7 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Define to use swagger and swagger UI
+// Use swagger middleware to serve generated Swagger as a JSON endpoint and Swagger UI.
 app.UseSwagger();
 app.UseSwaggerUI();
 
