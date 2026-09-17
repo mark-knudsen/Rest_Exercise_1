@@ -55,10 +55,10 @@ namespace Rest_Exercise_1.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<Cat> Post([FromBody] Cat newCat)
         {
-            //if (newCat == null)
-            //{
-            //    return BadRequest();
-            //}
+            if (newCat == null)
+            {
+                return BadRequest();
+            }
             Cat createdCat = _repository.Add(newCat);
             return CreatedAtAction(nameof(Get), new { id = createdCat.Id }, createdCat);
         }
