@@ -20,11 +20,11 @@ namespace Rest_Exercise_1.Controllers
             _repository = repository;
         }
 
+        #region GET Methods
 
         // GET: api/cats
         [DisableCors]
         [HttpGet]
-        //[EnableCors("AllowAll")]  // Enable CORS for this endpoint
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<Cat>> Get()
         {
@@ -34,7 +34,8 @@ namespace Rest_Exercise_1.Controllers
         // GET api/cats/1
         [DisableCors]
         [HttpGet("{id}")]
-
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<Cat> Get(int id)
         {
             Cat? cat = _repository.GetById(id);
@@ -44,6 +45,9 @@ namespace Rest_Exercise_1.Controllers
             }
             return Ok(cat);
         }
+        #endregion
+
+        #region POST Method
 
         // POST api/cats
         [HttpPost]
@@ -51,13 +55,16 @@ namespace Rest_Exercise_1.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<Cat> Post([FromBody] Cat newCat)
         {
-            if (newCat == null)
-            {
-                return BadRequest();
-            }
+            //if (newCat == null)
+            //{
+            //    return BadRequest();
+            //}
             Cat createdCat = _repository.Add(newCat);
             return CreatedAtAction(nameof(Get), new { id = createdCat.Id }, createdCat);
         }
+        #endregion
+
+        #region PUT Method
 
         // PUT api/cats/1
         [HttpPut("{id}")]
@@ -72,6 +79,9 @@ namespace Rest_Exercise_1.Controllers
             }
             return Ok(updatedCat);
         }
+        #endregion
+
+        #region DELETE Methods
 
         // DELETE api/cats/1
         [HttpDelete("{id}")]
@@ -86,6 +96,7 @@ namespace Rest_Exercise_1.Controllers
             }
             return Ok(deletedCat);
         }
+        #endregion
 
     }
 }
