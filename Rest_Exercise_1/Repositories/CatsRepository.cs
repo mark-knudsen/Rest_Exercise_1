@@ -1,6 +1,7 @@
 ﻿using Rest_Exercise_1.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Rest_Exercise_1.Repositories
 {
@@ -22,6 +23,34 @@ namespace Rest_Exercise_1.Repositories
         public List<Cat> GetAll()
         {
             return new List<Cat>(_cats);
+        }
+
+        // Read All with query support (GET)
+        public IEnumerable<Cat> GetAllCats(int? minimumweight, int? maximumweight, string? nameFilter)
+        {
+            if (minimumweight > maximumweight &&
+                minimumweight != null && maximumweight != null)
+            {
+                throw new ArgumentException("Minimum weight cannot be greater than maximum weight.");
+            }
+
+            IEnumerable<Cat> result = _cats.AsReadOnly();
+
+            if (minimumweight != null)
+            {
+                result = result.Where(c => c.Weight >= minimumweight);
+            }
+            if (maximumweight != null)
+            {
+                result = result.Where(c => c.Weight <= maximumweight);
+            }
+            if (nameFilter != null)
+            {
+                result = result.Where(c => c.Name != null &&
+                    c.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return result;
         }
 
         // Read by ID (GET)

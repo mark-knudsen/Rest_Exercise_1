@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Rest_Exercise_1.Repositories;
 
 namespace Rest_Exercise_1.Controllers
 {
-    [EnableCors("MyPolicy")] // ADD CORS policy to the controller
+    //[EnableCors("MyPolicy")] // ADD CORS policy to the controller
     [Route("api/[controller]")]
     [ApiController]
     public class CatsController : ControllerBase
@@ -21,14 +22,27 @@ namespace Rest_Exercise_1.Controllers
         }
 
         #region GET Methods
-
         // GET: api/cats
         [DisableCors]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<Cat>> Get()
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<Cat>> Get(
+            [FromQuery] int? minimumweight,
+            [FromQuery] int? maximumweight,
+            [FromQuery] string? nameFilter)
         {
-            return Ok(_repository.GetAll());
+            try
+            {
+                IEnumerable<Cat> result = _repository.GetAllCats(minimumweight, maximumweight, nameFilter);
+                if (result == null || result.Count() == 0) return NoContent();
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET api/cats/1
@@ -47,12 +61,13 @@ namespace Rest_Exercise_1.Controllers
         }
         #endregion
 
-        #region POST Method
 
+        #region POST Method
         // POST api/cats
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Admin")]
         public ActionResult<Cat> Post([FromBody] Cat newCat)
         {
             if (newCat == null)
@@ -64,12 +79,13 @@ namespace Rest_Exercise_1.Controllers
         }
         #endregion
 
-        #region PUT Method
 
+        #region PUT Method
         // PUT api/cats/1
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "User")]
         public ActionResult<Cat> Put(int id, [FromBody] Cat updates)
         {
             Cat? updatedCat = _repository.Update(id, updates);
@@ -81,12 +97,13 @@ namespace Rest_Exercise_1.Controllers
         }
         #endregion
 
-        #region DELETE Methods
 
+        #region DELETE Methods
         // DELETE api/cats/1
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Admin")]
         public ActionResult<Cat> Delete(int id)
         {
             Cat? deletedCat = _repository.Delete(id);
