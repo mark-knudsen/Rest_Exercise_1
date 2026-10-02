@@ -60,7 +60,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ vars.RestDevOps_CLIENT_ID_E084 }}
+          client-id: ${{ vars.RestDevOps_CLIENT_ID_AAE6 }}
           tenant-id: ${{ vars.RestDevOps_TENANT_ID_E084 }}
           subscription-id: ${{ vars.RestDevOps_SUBSCRIPTION_ID_3063 }}
 
