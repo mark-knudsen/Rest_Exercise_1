@@ -6,18 +6,33 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Define a policy name
-var myAllowSpecificOrigins = "AllowAll";
-
-// 2. Add CORS service and configure policy
+// 1. Add CORS service and configure multiple policies for educational purposes
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: myAllowSpecificOrigins,
+    // Restrictive: only the Vite dev server frontend, any method/header
+    options.AddPolicy(name: "AllowFrontendOrigin",
         policy =>
         {
-            //policy.AllowAnyOrigin()   // Allow any origin to access
-            policy.WithOrigins("http://localhost:5173") // Allow specific origin
+            policy.WithOrigins("http://localhost:5173")
                   .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+
+    // Permissive: any origin, any method, any header (useful to demonstrate the risk)
+    options.AddPolicy(name: "AllowAnyOrigin",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+
+    // Restrictive: any origin, but only GET requests allowed
+    options.AddPolicy(name: "AllowGetOnly",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .WithMethods("GET")
                   .AllowAnyHeader();
         });
 });
@@ -28,7 +43,6 @@ builder.Services.AddControllers();
 
 // Add swagger (Swashbuckle)
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(opt =>
 {
     opt.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -99,19 +113,19 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Use swagger middleware to serve generated Swagger as a JSON endpoint and Swagger UI.
-app.UseSwagger();
-app.UseSwaggerUI();
-
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Use swagger middleware to serve generated Swagger as a JSON endpoint and Swagger UI.
+    app.UseSwagger();
+    app.UseSwaggerUI();
     app.MapOpenApi();
 }
 
-// 3. Define that CORS should be used!
-app.UseCors(myAllowSpecificOrigins);
+app.UseHttpsRedirection();
+
+// 2. Define the DEFAULT CORS policy (used when no [EnableCors]/[DisableCors] attribute overrides it)
+app.UseCors("AllowFrontendOrigin");
 
 app.UseAuthentication(); // Checks "Who are you?"
 app.UseAuthorization();  // Checks "Are you allowed to be here?"

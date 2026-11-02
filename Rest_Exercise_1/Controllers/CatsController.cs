@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Rest_Exercise_1.Models;
 using Rest_Exercise_1.Repositories;
 
 namespace Rest_Exercise_1.Controllers
 {
-    //[EnableCors("MyPolicy")] // ADD CORS policy to the controller
     [Route("api/[controller]")]
     [ApiController]
     public class CatsController : ControllerBase
@@ -23,7 +21,7 @@ namespace Rest_Exercise_1.Controllers
 
         #region GET Methods
         // GET: api/cats
-        [DisableCors]
+        [EnableCors("AllowAnyOrigin")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -46,7 +44,7 @@ namespace Rest_Exercise_1.Controllers
         }
 
         // GET api/cats/1
-        [DisableCors]
+        [EnableCors("AllowGetOnly")]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -100,6 +98,7 @@ namespace Rest_Exercise_1.Controllers
 
         #region DELETE Methods
         // DELETE api/cats/1
+        [DisableCors] // Demonstrates blocking all cross-origin requests to this action
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
